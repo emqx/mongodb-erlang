@@ -177,7 +177,11 @@ init_pool(#state{host = Host, port = Port, pool_conf = Conf, worker_opts = Wopts
 parse_seed(Addr) when is_binary(Addr) ->
   parse_seed(binary_to_list(Addr));
 parse_seed(Addr) when is_list(Addr) ->
-  [Host, Port] = string:tokens(Addr, ":"),
+  [Host0, Port] = string:tokens(Addr, ":"),
+  Host = case inet:parse_address(Host0) of
+             {ok, H} -> H;
+             _ -> Host0
+         end,
   {Host, list_to_integer(Port)}.
 
 %% @private
