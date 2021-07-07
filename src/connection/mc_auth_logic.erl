@@ -51,8 +51,8 @@ scram_sha_1_auth(Socket, Database, Login, Password, SetOpts) ->
   try
     scram_first_step(Socket, Database, Login, Password, SetOpts)
   catch
-    _:_ ->
-      erlang:error(<<"Can't pass authentification">>)
+    Error:Reason:StackTrace ->
+      erlang:error({<<"Can't pass authentification">>, Error, Reason, StackTrace})
   end.
 
 %% @private

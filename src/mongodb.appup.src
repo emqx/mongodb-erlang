@@ -1,0 +1,13 @@
+%% -*- mode: erlang -*-
+{"3.0.8",
+ [{<<"3.0.[0-7]">>, [
+    {restart_application, mongodb}
+  ]},
+  {<<".*">>, []}
+ ],
+ [{<<"3.0.[0-7]">>, [
+    {restart_application, mongodb}
+  ]},
+  {<<".*">>, []}
+ ]
+}.
