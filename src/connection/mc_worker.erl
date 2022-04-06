@@ -215,6 +215,15 @@ get_set_opts_module(Options) ->
 auth_if_credentials(_, _, _, Login, Password) when Login =:= undefined; Password =:= undefined ->
   ok;
 auth_if_credentials(Socket, ConnState, NetModule, Login, Password) ->
-  Version = mc_worker_logic:get_version(Socket, ConnState#conn_state.auth_source, NetModule),
-  mc_auth_logic:auth(Version, Socket, ConnState#conn_state.auth_source, Login, Password, NetModule),
-  ok.
+  try
+    Version = mc_worker_logic:get_version(Socket, ConnState#conn_state.auth_source, NetModule),
+    true = mc_auth_logic:auth(Version, Socket, ConnState#conn_state.auth_source, Login, Password, NetModule),
+    ok
+  catch E:R:S ->
+    logger:error("Mongo client auth failed ~p: ~p: ~0p", [E, R, S]),
+    %% Ignore this auth error.
+    %% Any query operation will return an auth error:
+    %% #{<<"code">> => 8000}
+    %% The caller should reset the connection parameters.
+    ok
+  end.

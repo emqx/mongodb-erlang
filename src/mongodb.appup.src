@@ -1,7 +1,8 @@
 %% -*- mode: erlang -*-
 {"3.0.13",
  [{"3.0.12", [
-    {load_module, mc_topology, brutal_purge, soft_purge, []}
+    {load_module, mc_topology, brutal_purge, soft_purge, []},
+    {load_module, mc_worker, brutal_purge, soft_purge, []}
   ]},
   {"3.0.11", [
     {add_module, mc_util},
@@ -40,7 +41,8 @@
  ],
  [
   {"3.0.12", [
-    {load_module, mc_topology, brutal_purge, soft_purge, []}
+    {load_module, mc_topology, brutal_purge, soft_purge, []},
+    {load_module, mc_worker, brutal_purge, soft_purge, []}
   ]},
   {"3.0.11", [
     {delete_module, mc_util},
