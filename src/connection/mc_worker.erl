@@ -51,12 +51,11 @@ init(Options) ->
       Login = mc_utils:get_value(login, Options),
       Password = mc_utils:get_value(password, Options),
       NextReqFun = mc_utils:get_value(next_req_fun, Options, fun() -> ok end),
-      auth_if_credentials(Socket, ConnState, NetModule, Login, Password),
-      gen_server:enter_loop(?MODULE, [],
-        #state{socket = Socket,
-          conn_state = ConnState,
-          net_module = NetModule,
-          next_req_fun = NextReqFun});
+      InitState = #state{socket = Socket, conn_state = ConnState, net_module = NetModule, next_req_fun = NextReqFun},
+      case auth_if_credentials(Socket, ConnState, NetModule, Login, Password) of
+        true -> gen_server:enter_loop(?MODULE, [], InitState);
+        {false, Reason} -> proc_lib:init_ack(Reason)
+      end;
     Error ->
       proc_lib:init_ack(Error)
   end.
@@ -213,8 +212,7 @@ get_set_opts_module(Options) ->
 
 %% @private
 auth_if_credentials(_, _, _, Login, Password) when Login =:= undefined; Password =:= undefined ->
-  ok;
+  true;
 auth_if_credentials(Socket, ConnState, NetModule, Login, Password) ->
   Version = mc_worker_logic:get_version(Socket, ConnState#conn_state.auth_source, NetModule),
-  mc_auth_logic:auth(Version, Socket, ConnState#conn_state.auth_source, Login, Password, NetModule),
-  ok.
+  mc_auth_logic:auth(Version, Socket, ConnState#conn_state.auth_source, Login, Password, NetModule).
