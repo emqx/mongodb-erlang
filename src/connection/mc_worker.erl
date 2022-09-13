@@ -54,7 +54,7 @@ init(Options) ->
       InitState = #state{socket = Socket, conn_state = ConnState, net_module = NetModule, next_req_fun = NextReqFun},
       case auth_if_credentials(Socket, ConnState, NetModule, Login, Password) of
         true -> gen_server:enter_loop(?MODULE, [], InitState);
-        {false, Reason} -> proc_lib:init_ack(Reason)
+        {false, Reason} -> exit(self(), Reason)
       end;
     Error ->
       proc_lib:init_ack(Error)

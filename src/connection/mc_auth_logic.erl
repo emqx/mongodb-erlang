@@ -42,7 +42,7 @@ mongodb_cr_auth(Socket, Database, Login, Password, SetOpts) ->
   Nonce = maps:get(<<"nonce">>, Res),
   case mc_worker_api:sync_command(Socket, Database, ?AUTH_CMD(Login, Nonce, Password), SetOpts) of
     {true, _} -> true;
-    {false, Reason} -> {false, Reason}
+    {false, Reason} -> logger:error("Can't pass authentification for reason: ~p", [Reason]), {false, Reason}
   end.
 
 %% @private
