@@ -76,7 +76,7 @@ use_legacy_protocol(Connection) ->
     %% removed in MongoDB version 5.1.0. See
     %% https://www.mongodb.com/docs/manual/legacy-opcodes/
     case mc_worker_pid_info:get_protocol_type(Connection) of
-        legacy -> 
+        legacy ->
             true;
         op_msg ->
             false
@@ -94,7 +94,7 @@ pw_key(Nonce, Username, Password) ->
   bson:utf8(binary_to_hexstr(crypto:hash(md5, [Nonce, Username, pw_hash(Username, Password)]))).
 
 pw_hash(Username, Password) ->
-  bson:utf8(binary_to_hexstr(crypto:hash(md5, [Username, <<":mongo:">>, Password]))).
+  bson:utf8(binary_to_hexstr(crypto:hash(md5, [Username, <<":mongo:">>, unwrap(Password)]))).
 
 -spec to_binary(string() | binary()) -> binary().
 to_binary(Str) when is_list(Str) ->  list_to_binary(Str);
@@ -104,3 +104,9 @@ to_binary(Str) when is_binary(Str) ->  Str.
 %% @private
 binary_to_hexstr(Bin) ->
   lists:flatten([io_lib:format("~2.16.0b", [X]) || X <- binary_to_list(Bin)]).
+
+unwrap(Term) when is_function(Term, 0) ->
+    %% Handle potentially nested funs
+    unwrap(Term());
+unwrap(Term) ->
+    Term.
