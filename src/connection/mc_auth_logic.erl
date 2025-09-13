@@ -140,14 +140,8 @@ generate_sig(SaltedPassword, AuthMessage) ->
   mc_utils:hmac(ServerKey, AuthMessage).
 
 %% @private
--if(?OTP_RELEASE >= 25).
 hi(Password, Salt, Iterations) ->
   crypto:pbkdf2_hmac(sha, Password, Salt, Iterations, 20).
--else.
-hi(Password, Salt, Iterations) ->
-  {ok, Key} = pbkdf2:pbkdf2(sha, Password, Salt, Iterations, 20),
-  Key.
--endif.
 
 %% @private
 xorKeys(<<>>, _, Res) -> Res;
