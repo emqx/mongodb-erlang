@@ -8,12 +8,12 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     name: Erlang/OTP ${{matrix.otp}}
     strategy:
       matrix:
-        otp: ['24.3.4.6']
-        rebar3: ['3.14.3']
+        otp: ['27']
+        rebar3: ['3.24']
     steps:
       - uses: actions/checkout@v3
       - uses: erlef/setup-beam@v1
