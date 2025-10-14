@@ -26,7 +26,7 @@
   }).
 
 %% API
--export([auth/6]).
+-export([auth/6, auth/5]).
 
 %% Authorize on database synchronously
 -spec auth(float(), port(), database(), binary() | undefined, binary() | undefined, module()) -> ok | {error, term()}.
@@ -35,6 +35,9 @@ auth(Version, Socket, Database, Login, Password, NetModule) when Version > 2.7 -
 auth(_, Socket, Database, Login, Password, NetModule) ->   %old authorisation
   mongodb_cr_auth(Socket, Database, Login, Password, NetModule).
 
+-spec auth(port(), database(), binary() | undefined, binary() | undefined, module()) -> ok | {error, term()}.
+auth(Socket, Database, Login, Password, NetModule) ->  %new authorization
+  scram_sha_1_auth(Socket, Database, Login, Password, NetModule).
 
 %% @private
 -spec mongodb_cr_auth(port(), database(), binary(), binary(), module()) -> ok | {error, term()}.
