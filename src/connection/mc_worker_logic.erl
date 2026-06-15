@@ -25,17 +25,16 @@ connect_to_database(Conf) ->
   SslOpts = mc_utils:get_value(ssl_opts, Conf, []),
   do_connect(Host, Port, Timeout, SSL, SslOpts).
 
-%% Get server version. This is need to choose default authentication method.
+%% Get server version. This was used to choose the default authentication
+%% method (SCRAM-SHA-1 for >= 2.7, legacy MONGODB-CR otherwise).
 -spec get_version(port(), binary(), module()) -> float().
-get_version(Socket, Database, SetOpts) ->
-  {true, #{<<"version">> := Version}} =
-    mc_worker_api:sync_command(Socket,
-                               Database,
-                               {<<"buildinfo">>, 1},
-                               SetOpts,
-                               mc_utils:use_legacy_protocol(self())),
-  {VFloat, _} = string:to_float(binary_to_list(Version)),
-  VFloat.
+get_version(_Socket, _Database, _SetOpts) ->
+  %% Always report the SCRAM-SHA-1 era (>= 3.0). MongoDB 4.0 removed
+  %% MONGODB-CR (the only mechanism this probe selected against), and
+  %% MongoDB 8.0 restricts `buildInfo` to authenticated callers, so
+  %% probing pre-auth fails and crashes the connection. Skip the probe
+  %% and always pick the SCRAM-SHA-1 path.
+  3.0.
 
 -spec encode_request(mc_worker_api:database(), mongo_protocol:message()) -> {binary(), pos_integer()}.
 encode_request(Database, Request) ->
